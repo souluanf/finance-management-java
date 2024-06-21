@@ -1,0 +1,81 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /transaction-service
+    encoding:
+      force: true
+  shutdown: graceful
+spring:
+  application:
+    name: transaction-service
+  profiles:
+    active: ${transaction-service.spring.profiles.active:dev}
+  datasource:
+    url: ${transaction-service.datasource.url}
+    password: ${transaction-service.datasource.password}
+    username: ${transaction-service.datasource.username}
+    hikari:
+      maximum-pool-size: ${transaction-service.datasource.hikari.maximum-pool-size}
+  web:
+    resources:
+      add-mappings: false
+  jpa:
+    open-in-view: ${transaction-service.jpa.open-in-view}
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: ${transaction-service.jpa.properties.hibernate.enable_lazy_load_no_trans}
+    hibernate:
+      ddl-auto: ${transaction-service.jpa.hibernate.ddl-auto}
+    show-sql: ${transaction-service.jpa.show-sql}
+  h2:
+    console:
+      enabled: ${transaction-service.h2.console.enabled}
+      path: ${transaction-service.h2.console.path}
+      settings:
+        web-allow-others: ${transaction-service.h2.console.settings.web-allow-others}
+  flyway:
+    enabled: ${transaction-service.flyway.enabled}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    clean-on-validation-error: true
+    out-of-order: true
+  main:
+    allow-bean-definition-overriding: true
+  jackson:
+    default-property-inclusion: non_null
+
+  rabbitmq:
+    host: ${transaction-service.rabbitmq.host}
+    port: ${transaction-service.rabbitmq.port}
+    username: ${transaction-service.rabbitmq.username}
+    password: ${transaction-service.rabbitmq.password}
+    transaction-service:
+      queue: ${transaction-service.rabbitmq.transaction-service.queue}
+      exchange: ${transaction-service.rabbitmq.transaction-service.exchange}
+      created-routing-key: ${transaction-service.rabbitmq.transaction-service.created-routing-key}
+
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: ${transaction-service.oidc.issuer-uri}
+          jwk-set-uri: ${transaction-service.oidc.jwk-set-uri}
+          client-id: ${transaction-service.oidc.client-id}
+          token-uri: ${transaction-service.oidc.token-uri}
+springdoc:
+  swagger-ui:
+    enabled: ${transaction-service.springdoc.swagger-ui.enabled}
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+
+openapi-servers-urls: ${transaction-service.openapi-servers-urls}
+
+logging:
+  pattern:
+    console: "%red(%d{yyyy-MM-dd'T'HH:mm:ssXXX}) %magenta([%thread]) [${spring.application.name}, %X{traceId:-}, %X{spanId:-}] %highlight(%-5level) %logger{36}.%M - %msg%n"
+
+
+api:
+  user:
+    host: ${transaction-service.api.user.host}
