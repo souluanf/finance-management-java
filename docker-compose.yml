@@ -1,0 +1,103 @@
+services:
+  user_db:
+    image: mysql:8.0
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${USER_DATABASE_PASSWORD}
+      MYSQL_USER: ${USER_DATABASE_USER}
+      MYSQL_PASSWORD: ${USER_DATABASE_PASSWORD}
+      MYSQL_DATABASE: ${USER_DATABASE_NAME}
+    ports:
+      - "${USER_DATABASE_PORT}:3306"
+    networks:
+      - finance-network
+    volumes:
+      - user-db-data:/var/lib/mysql
+
+  transaction_db:
+    image: mysql:8.0
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${TRANSACTION_DATABASE_PASSWORD}
+      MYSQL_USER: ${TRANSACTION_DATABASE_USER}
+      MYSQL_PASSWORD: ${TRANSACTION_DATABASE_PASSWORD}
+      MYSQL_DATABASE: ${TRANSACTION_DATABASE_NAME}
+    ports:
+      - "${TRANSACTION_DATABASE_PORT}:3306"
+    networks:
+      - finance-network
+    volumes:
+      - transaction-db-data:/var/lib/mysql
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.3
+    container_name: keycloak
+    command:
+      - start-dev
+      - --import-realm
+      - --log-level=DEBUG
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_LOGLEVEL: DEBUG
+    volumes:
+      - ./auth/realm.json:/opt/keycloak/data/import/realm.json
+    networks:
+      - finance-network
+    ports:
+      - "8080:8080"
+
+  rabbitmq:
+    env_file:
+      - .env
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - finance-network
+
+  user-service:
+    env_file:
+      - .env
+    build:
+      context: user-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - finance-network
+    depends_on:
+      - user_db
+      - rabbitmq
+      - keycloak
+
+  transaction-service:
+    env_file:
+      - .env
+    build:
+      context: transaction-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      - finance-network
+    depends_on:
+      - transaction_db
+      - rabbitmq
+      - keycloak
+
+networks:
+  finance-network:
+
+volumes:
+  user-db-data:
+  transaction-db-data:
+  rabbitmq-data:
