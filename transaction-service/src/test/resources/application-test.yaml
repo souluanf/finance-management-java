@@ -1,0 +1,19 @@
+transaction-service:
+  datasource:
+    password: sa
+    username: sa
+    url: jdbc:h2:mem:example-db;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
+  flyway:
+    enabled: false
+  oidc:
+    issuer-uri: http://localhost:8080/realms/finance-management
+    jwk-set-uri: ${spring.security.oauth2.resource-server.jwt.issuer-uri}/protocol/openid-connect/certs
+  openapi-servers-urls: http://localhost:${server.port}${server.servlet.context-path}, http://127.0.0.1:${server.port}${server.servlet.context-path}
+
+  springdoc:
+    swagger-ui:
+      enabled: true
+
+  api:
+    user:
+      host: http://localhost:8081/user-service
