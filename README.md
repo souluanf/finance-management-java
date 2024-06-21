@@ -98,6 +98,10 @@ Importe ambas as collections para o Postman e teste os serviços
 |:------------:|:------------:|
 |   `admin`    |   `admin`    |
 
+## Desenho da solução
+
+![finance-management-java.png](finance-management-java.png)
+
 ## Contato
 
 Para suporte ou feedback:
