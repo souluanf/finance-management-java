@@ -1,0 +1,47 @@
+user-service:
+  datasource:
+    url: jdbc:mysql://${USER_DATABASE_HOST}:3306/${USER_DATABASE_NAME}
+    username: ${USER_DATABASE_USER}
+    password: ${USER_DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 1
+  h2:
+    console:
+      enabled: false
+      path: /h2-console
+      settings:
+        web-allow-others: false
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    transaction-service:
+      queue: ${RABBITMQ_TRANSACTION_QUEUE}
+      exchange: ${RABBITMQ_TRANSACTION_EXCHANGE}
+      created-routing-key: ${RABBITMQ_TRANSACTION_CREATED_ROUTING_KEY}
+
+  oidc:
+    issuer-uri: ${KEYCLOAK_HOST}/realms/${KEYCLOAK_REALM}
+    jwk-set-uri: ${spring.security.oauth2.resource-server.jwt.issuer-uri}/protocol/openid-connect/certs
+    client-id: ${KEYCLOAK_REALM}
+    token-uri: ${spring.security.oauth2.resource-server.jwt.issuer-uri}/protocol/openid-connect/token
+
+  springdoc:
+    swagger-ui:
+      enabled: true
+  openapi-servers-urls: http://localhost:${server.port}${server.servlet.context-path}, http://127.0.0.1:${server.port}${server.servlet.context-path}
+
+  api:
+    transaction:
+      host: ${API_TRANSACTION_HOST}
